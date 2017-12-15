@@ -25,7 +25,7 @@ jobs:
   - name: cephfs
     instances: 1
     vm_type: default  
-    persistent_disk_type: default
+    persistent_disk: 24000
     stemcell: default
     networks:
     - name: default
@@ -37,4 +37,8 @@ jobs:
     properties:
       cephfs:
         client_keyring: |
-          
+          [client.admin]
+            key = AQDrWzJae1DGCxAAXGvPgKptRBAIGM3bxztrtw==
+            caps mds = "allow"
+            caps mon = "allow *"
+            caps osd = "allow *"
