@@ -10,6 +10,14 @@ packages:
 - setuptools
 - cephfs
 
+consumes:
+- name: ceph-storage
+	type: storage
+
+provides:
+- name: ceph-storage
+	type: storage
+
 properties:
   cephfs.client_keyring:
     description: "contents of a client keyring to allow to access cephfs"
