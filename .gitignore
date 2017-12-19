@@ -15,7 +15,7 @@ cephfs-manifest.yml
 
 ## goPath system specifics
 pkg
-bin/
+
 
 ## vim plugins to ignore
 src/9fans.net/
