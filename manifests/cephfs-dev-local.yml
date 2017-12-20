@@ -13,9 +13,9 @@ update:
   max_in_flight: 2
 
 stemcells:
-- alias: default
-  os: ubuntu-trusty
-  version: latest
+  - alias: default
+    os: ubuntu-trusty
+    version: latest
 
 credentials:
   username: fucker
