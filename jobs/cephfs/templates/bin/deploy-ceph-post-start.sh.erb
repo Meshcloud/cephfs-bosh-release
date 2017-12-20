@@ -1,0 +1,57 @@
+#!/bin/bash
+
+set -x
+
+PWD=`pwd`
+user=vcap
+hostname=`hostname`
+
+ipaddr=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
+firstadress=<%= p(link("storage").instances.first.address) %>
+clusternodes=<%= p(link("storage").instances) %>
+
+if["$ipaddr" == "$firstadress"]; then 	
+	mkdir ~/ceph-cluster && cd ~/ceph-cluster
+	echo "Deploying monitor to $ipaddr"
+	ceph-deploy new $ipaddr #make the admin Node to the Monitor node
+
+	if [ ! -e "ceph.conf" ];then
+        echo "Error while deploying monitor. File ceph.conf is missing - Exiting!"
+        exit 1
+	fi
+
+	echo "public network = {ipaddr}/{netmask}" >> ceph.conf #todo
+
+	for(clusternode in "${clusternodes[@]}")
+	do
+	 ceph-deploy install $clusternodes
+	done	
+
+	ceph-deploy mon create-initial
+
+	if [ ! -e "ceph.client.admin.keyring" ] && [ ! -e "ceph.bootstrap-mgr.keyring" ] ;then
+        echo "Error while creating initial monitor. keyring missing. Exiting!"
+        exit 1
+	fi
+
+	for(clusternode in "${clusternodes[@]}")
+	do
+	 ceph-deploy admin $clusternode
+	done	
+
+	for(clusternode in "${clusternodes[@]}")
+	do
+	 ceph-deploy admin $clusternode
+	done	
+
+	##creating OSDS
+
+	ceph health > /var/vcap/sys/log/cephfs/health
+
+
+fi	
+
+
+
+exit 0
