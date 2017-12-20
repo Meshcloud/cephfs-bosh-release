@@ -45,11 +45,34 @@ if["$ipaddr" == "$firstadress"]; then
 	 ceph-deploy admin $clusternode
 	done	
 
-	##creating OSDS
+	##Creating OSDS
+
+
+	diskfile=$(sudo lsblk | grep /var/vcap/store |  cut -d" " -f1 | sed 's/^..//' | sed 's/.$//')
+
+	for(clusternode in "${clusternodes[@]}")
+	do
+	 ceph-deploy disk zap $clusternode:$diskfile
+	 ceph-deploy osd prepare $clusternode:$diskfile
+	 ceph-deploy osd activate $clusternode:$diskfile
+	done	
+
 
 	ceph health > /var/vcap/sys/log/cephfs/health
 
+	#Creating Metadata Server 
+	##We choose the Second Server of our cluster to be the Metada Server
 
+	ceph-deploy mds create ${clusternodes[1]}
+	ceph-deploy install ceph-client
+
+	#Deploy CephFS
+	##Create OSD Pools
+
+	ceph osd pool create cephfs_data 128
+	ceph osd pool create cephfs_metadata 128
+	ceph fs new cephfs cephfs_metadata cephfs_data
+	ceph mds stat
 fi	
 
 
