@@ -4,20 +4,20 @@ templates:
   keyring.erb: keys/ceph.client.admin.keyring
   bin/install_cluster.sh.erb: bin/pre-start
   ctl.erb: bin/ctl
-  deploy-ceph-post-start.sh.erb: bin/post-start
+  bin/deploy-ceph-post-start.sh.erb: bin/post-start
 
 packages:
-- python27
-- setuptools
-- cephfs
+  - python27
+  - setuptools
+  - cephfs
 
 consumes:
-- name: ceph-storage
-	type: storage
+  - name: ceph-storage
+    type: storage
 
 provides:
-- name: ceph-storage
-	type: storage
+  - name: ceph-storage
+    type: storage
 
 properties:
   cephfs.client_keyring:
