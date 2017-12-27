@@ -1,24 +1,42 @@
 #!/bin/bash
 
+#Set Up..
 set -x
-
+username=<%= p("cephfs.username") %>
 PWD=`pwd`
 user=vcap
 hostname=`hostname`
 ipaddr=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
-firstadress=<%= p(link("storage").instances.first.address) %>
+firstadress='<%= (link('ceph-storage').instances.first.address) %>'
+#Clear Monitor file 
+rm /home/$username/.status
+apt-get install jq
+
+CLUSTERNODES='<%=
+		clusternodes = link('ceph-storage').instances.map do |instance|
+		{
+			"name" => instance.name,
+			"id" => instance.id,
+			"index" => instance.index,
+			"az" => instance.az,
+			"address" => instance.address
+		}
+		end
+		JSON.dump(clusternodes)
+	%>' 
+ADDRESSES=( $(echo $CLUSTERNODES | jq '.[] | .address') )
+IDS=( $(echo $CLUSTERNODES | jq '.[] | .id') )
+
 
 #Setup of Ceph Admin Node 
 
-#TODO: Add check for this Node being the admin Node
-
-if["$ipaddr" == "$firstadress"]; then 	
+if [ "$ipaddr" == "$firstadress" ]; then 	
 	echo "Being on Admin Host $ipaddr installing Ceph Admin tools"
 	wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
 	echo deb https://download.ceph.com/debian/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
-	sudo apt update
-	sudo apt install ceph-deploy
+	sudo apt-get update
+	sudo apt-get install ceph-deploy
 else 
 	echo "not the admin host $ipaddr" 
 fi		
@@ -26,37 +44,48 @@ fi
 #Preflight Setup of all Nodes including Admin one
 ##Installing SSH and establishing the Keys
 echo "configuring ssh server..."
-username=<%= p("cephfs.username") %>
-sshpubkey=<%= p("cephfs.sshpubkey") %>
-sudo apt install ntp
-sudo apt install openssh-server
+sshpubkey='<%= p("cephfs.sshpubkey") %>'
+
+echo "$sshpubkey"
+
+sudo apt-get install ntp
+sudo apt-get install openssh-server
 sudo useradd -d /home/$username -m $username
-sudo passwd $username
 echo "$username ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$username
 sudo chmod 0440 /etc/sudoers.d/$username
-echo $sshpubkey > /home/$username/.ssh/authorized_keys 
+mkdir -p /home/$username/.ssh/
+touch /home/$username/.ssh/authorized_keys 
+touch /home/$username/.ssh/config
+echo "$sshpubkey" | tee /home/$username/.ssh/authorized_keys 
 
-if["$ipaddr" == "$firstadress"]; then
+if [ "$ipaddr" == "$firstadress" ]; then
 	echo "Adding SSH-Config..."
-	sshprivkey=<%= p("cephfs.sshprivkey") %>
-	echo sshprivkey > priv.rsa
+	sshprivkey='<%= p("cephfs.sshprivkey") %>'
+	echo $sshprivkey | tee  /home/$username/.ssh/priv.rsa
+	
+	echo "Writing SSH-Config"
 
-	clusternodes=<%= p(link("storage").instances) %>
-
-	for(i in "${clusternodes[@]}")
+	for i in "${!ADDRESSES[@]}"
 	do
-	 echo "Host $i.address" >> ~/.ssh/config	
-	 echo "	Hostname $i.address" >> ~/.ssh/config	
-	 echo "	User $username" >> ~/.ssh/config
-	 echo "	IdentityFile ~/.ssh/config/priv.rsa" >> ~/.ssh/config
-
+	 echo "Host  $(echo $(echo ${IDS[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a /home/$username/.ssh/config 
+	 echo " Hostname  $(echo $(echo ${ADDRESSES[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a /home/$username/.ssh/config
+	 echo " User $username" | tee -a /home/$username/.ssh/config
+	 echo " IdentityFile /home/$username/.ssh/config/priv.rsa" | tee -a /home/$username/.ssh/config
 	done	
 
-#add etc Hosts fot 
-cat<<EOF >>hosts
+#add etc Hosts  
+cat<<EOF >hosts
 127.0.0.1       localhost
 $ipaddr         $hostname
+EOF
 
+for i in "${!ADDRESSES[@]}"
+do
+	echo "$(echo $(echo ${ADDRESSES[$i]} | sed -e 's/^"//' -e 's/"$//'))  $(echo $(echo ${IDS[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a hosts
+done	
+
+
+cat<<EOF >>hosts 
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback
 ff02::1 ip6-allnodes
@@ -75,7 +104,7 @@ sudo iptables -A INPUT -i $iface -p tcp -s $ipaddr/255.255.255.0 --dport 6800:73
 sudo /etc/init.d/iptables-persistent save 
 
 
-
+echo "done" | tee /home/$username/.status
 
 exit 0
 

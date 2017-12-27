@@ -22,3 +22,11 @@ provides:
 properties:
   cephfs.client_keyring:
     description: "contents of a client keyring to allow to access cephfs"
+  cephfs.username:
+    description: "the username of the systemsuser created to use cephdeploy"
+  cephfs.sshpubkey:
+    description: "a Publickey used for ssh login from cephdeploy"
+  cephfs.sshprivkey:
+    description: "corresponding private"
+    
+

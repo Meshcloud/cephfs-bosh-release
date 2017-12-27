@@ -46,3 +46,36 @@ jobs:
             caps mds = "allow"
             caps mon = "allow *"
             caps osd = "allow *"
+        username:
+          meshlab
+        sshpubkey: |
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCpTLbIWpHhd4iZZIFU+oWUHCvFq2iOKdY0ICt7LKinMAbB/ZUGTJiHkY2KArsqwtkM6vEblmTlsE+Vxhyatt2+SKbaFkNUk0qPgkphWrY+qtfRjSj6egBJvb8pMkl04icxQQEA85Jp6K2udZZ0Yqcgsv/ppQpadyqQnbnK7sI9MxKTHTAElU/NahVtGi41Yth1zCskuGQ3AVZTOgGleUnYhxnF0bEzMG0ZbChC8Ko6BwSJ08W58Pi3xLYlCZG0owcU++V8cc8PIO/JyX2WcaMf3pVdwJnNa8eVugv1smlxZmTjxQOb/NeTGdXJ4uT1YgLtySjP033VP8YK3PcF5Edn jannikheyl@Janniks-MBP
+        sshprivkey: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEpAIBAAKCAQEAqUy2yFqR4XeImWSBVPqFlBwrxatojinWNCAreyyopzAGwf2V
+          BkyYh5GNigK7KsLZDOrxG5Zk5bBPlcYcmrbdvkim2hZDVJNKj4JKYVq2PqrX0Y0o
+          +noASb2/KTJJdOInMUEBAPOSaeitrnWWdGKnILL/6aUKWncqkJ25yu7CPTMSkx0w
+          BJVPzWoVbRouNWLYdcwrJLhkNwFWUzoBpXlJ2IcZxdGxMzBtGWwoQvCqOgcEidPF
+          ufD4t8S2JQmRtKMHFPvlfHHPDyDvycl9lnGjH96VXcCZzWvHlboL9bJpcWZk48UD
+          m/zXkxnVyeLk9WIC7ckoz9N91T/GCtz3BeRHZwIDAQABAoIBACiodsEZFy25okGM
+          ZI7+9zOBrHV1W8/AdmPgUfDr4bj9DLJr7u0rWfo812wMidyUHMJAbhT9AlAzDnne
+          sSHqxsga9I8th4/5K4/Zb3l/6oKUTu5RY0T8JbOP8Se4nvGGGnl2rgIHfOMYcRWT
+          wcVDp/VvZ4w6CYl+UueWKXd17Yn6pP2vc0JPxmwwpq8IBACNe7ma1sUJs0HoI2yg
+          3+gw9R+bm9u4WNC50sS1wRYLVfmcU97HlMg3RI6qNkRq7Tim4gNHoM10wWCct7U8
+          QFhXumFYKZ2kWT59fU9rGNW0HYcfF0Og6HaP8fDuV30dCDyVUOrntcVeUXK5ihxx
+          gCFxG7ECgYEA0MsUd9Ei4fXdyWKZFuNJb/ifZ/JyFzuQiob2q5AIvN4raj17d13l
+          uc3I/vOwaDjPJkJy86T9t/oA3LaXjOLDOCCWhWzh88pfZJ1OcVF1pXiownPG4Lzh
+          JrFkMIk3O0l6gQlTC83hey4iZt0IHkfjv2GG5bc3mCitSIrx+OyjnN8CgYEAz5PA
+          B9ssq+DmPxED6Z9FNMexg5WuP2QJV9zIo2Ah2ppp0AqmuwcJfBDlDjb+FxTYdtyz
+          7WUGCwSasvx4mIxjF2GsHJ+VFJTkzTpfNWDpJNGjPcvvGn8eF9uoyjfhQfrCQsQc
+          LuNb6OmfODeu0kwi4ImIRflL+OpQzBgR9HhzHnkCgYAW4Yp2rvaRqK4LecCpH3NW
+          z/o4G/ugzChE5hF2L6yldftwAxjatfGM8R5Lwkzcvw0Edle+l6AuXzlk9qWZDOiz
+          5+5W5N3GJ7FYh1ynUnQAFD76QFHVIx3RbbM7Fm51EtJX/buaGY/SPfYLK8HN/7bX
+          rEpqNi/jfuGuh3uI+fXcJQKBgQCHkwS1HN2MVROM1Vws1i2pT1QNkVGBbaD8leMl
+          ccAquvepPYuwU+RJ9+7i3eAOyzqmR3fs8TKFN7iidmt9lxORTeXPvBrummDl+d39
+          SxJ7TcDEt9GvCJ9rDbisetrQ8Sq32MZfiXeaJBwt55BzIe8VoD41FaIdLU0gQAha
+          F+F4YQKBgQDPSsX5V87Ez3lIJ8qV4RgfBzRWr+Gg5f8Lh15XjlNDMXiLbYiylaWG
+          SBbdql0oJW1XrnYzumz2CccTccotnnmTrJhaT6v5Urj/xAx6D+wvNk1DywF6Q3HR
+          JqWXVnJn0A+BfaSWwLrJQ0eZJ7YV4ew3qMFENlE2SjD+/XPd5Qe+cA==
+          -----END RSA PRIVATE KEY-----
+              

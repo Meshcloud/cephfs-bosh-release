@@ -2,7 +2,7 @@
 
 RUN_DIR=/var/vcap/sys/run/cephfs
 PIDFILE=${RUN_DIR}/pid
-
+username=<%= p("cephfs.username") %>
 
 case $1 in
 
@@ -10,13 +10,13 @@ case $1 in
         
     mkdir -p $RUN_DIR
     chown -R vcap:vcap $RUN_DIR
-    status=$(ceph health | grep HEALTH_OK)
-    while [ "$status" != "HEALTH_OK" ]; do
+    status=$(cat /home/$username/.status)
+    while [ "$status" != "done" ]; do
       sleep 2
-      status=$(ceph health | grep HEALTH_OK)
+      status=$(cat /home/$username/.status)
     done
 
-    echo `pgrep -f ceph-mon` > $PIDFILE
+    echo "done" > $PIDFILE
 
     # chown cephfs to vcap
     mkdir /home/vcap/cephfs

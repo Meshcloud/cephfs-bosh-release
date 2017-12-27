@@ -8,8 +8,8 @@ hostname=`hostname`
 
 ipaddr=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
-firstadress=<%= p(link("storage").instances.first.address) %>
-clusternodes=<%= p(link("storage").instances) %>
+firstadress=<%= (link("ceph-storage").instances.first.address) %>
+clusternodes=<%= (link("ceph-storage").instances) %>
 
 if["$ipaddr" == "$firstadress"]; then 	
 	mkdir ~/ceph-cluster && cd ~/ceph-cluster
@@ -23,7 +23,7 @@ if["$ipaddr" == "$firstadress"]; then
 
 	echo "public network = {ipaddr}/{netmask}" >> ceph.conf #todo
 
-	for(clusternode in "${clusternodes[@]}")
+	for clusternode in "${clusternodes[@]}"
 	do
 	 ceph-deploy install $clusternodes
 	done	
@@ -35,12 +35,12 @@ if["$ipaddr" == "$firstadress"]; then
         exit 1
 	fi
 
-	for(clusternode in "${clusternodes[@]}")
+	for clusternode in "${clusternodes[@]}"
 	do
 	 ceph-deploy admin $clusternode
 	done	
 
-	for(clusternode in "${clusternodes[@]}")
+	for clusternode in "${clusternodes[@]}"
 	do
 	 ceph-deploy admin $clusternode
 	done	
@@ -50,7 +50,7 @@ if["$ipaddr" == "$firstadress"]; then
 
 	diskfile=$(sudo lsblk | grep /var/vcap/store |  cut -d" " -f1 | sed 's/^..//' | sed 's/.$//')
 
-	for(clusternode in "${clusternodes[@]}")
+	for clusternode in "${clusternodes[@]}"
 	do
 	 ceph-deploy disk zap $clusternode:$diskfile
 	 ceph-deploy osd prepare $clusternode:$diskfile
