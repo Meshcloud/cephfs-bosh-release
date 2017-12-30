@@ -57,25 +57,24 @@ touch /home/$username/.ssh/authorized_keys
 chown -R $username:$username /home/$username/.ssh
 chmod 700 /home/$username/.ssh/priv.rsa && chmod 700 /home/$username/.ssh
 #vcap is the user bosh uses for install scripts which needs ssh connectivity at post deployment
-mkdir -p /home/vcap/.ssh/
-rm /home/vcap/.ssh/config
+mkdir -p ~/.ssh/
+rm ~/.ssh/config
 echo "$sshpubkey" | tee /home/$username/.ssh/authorized_keys 
 
 if [ "$ipaddr" == "$firstadress" ]; then
 	echo "Adding SSH-Config..."
 
-	mv /var/vcap/jobs/cephfs/config/certs/priv.rsa /home/vcap/.ssh/priv.rsa
-	chown -R vcap:vcap /home/vcap/.ssh
-	chmod 700 /home/vcap/.ssh/priv.rsa && chmod 700 /home/vcap/.ssh
+	mv /var/vcap/jobs/cephfs/config/certs/priv.rsa ~/.ssh/priv.rsa
+	chmod 700 ~/.ssh/priv.rsa && chmod 700 ~/vcap/.ssh
 
 	echo "Writing SSH-Config"
 
 	for i in "${!ADDRESSES[@]}"
 	do
-	 echo "Host $(echo $(echo ${IDS[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a /home/vcap/.ssh/config 
-	 echo " Hostname $(echo $(echo ${ADDRESSES[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a /home/vcap/.ssh/config
-	 echo " User $username" | tee -a /home/vcap/.ssh/config
-	 echo " IdentityFile /home/vcap/.ssh/priv.rsa" | tee -a /home/vcap/.ssh/config
+	 echo "Host $(echo $(echo ${IDS[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a ~/.ssh/config 
+	 echo " Hostname $(echo $(echo ${ADDRESSES[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a ~/.ssh/config
+	 echo " User $username" | tee -a ~/.ssh/config
+	 echo " IdentityFile ~/.ssh/priv.rsa" | tee -a ~/.ssh/config
 	done	
 
 	#add etc Hosts  
