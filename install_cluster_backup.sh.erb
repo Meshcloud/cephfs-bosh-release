@@ -36,7 +36,7 @@ if [ "$ipaddr" == "$firstadress" ]; then
 	wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
 	echo deb https://download.ceph.com/debian/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
 	sudo apt-get update
-	sudo apt-get install -f ceph-deploy
+	sudo apt-get install ceph-deploy
 else 
 	echo "not the admin host $ipaddr" 
 fi		
@@ -55,7 +55,7 @@ usermod -G bosh_sshers meshlab
 mkdir -p /home/$username/.ssh/
 touch /home/$username/.ssh/authorized_keys 
 chown -R $username:$username /home/$username/.ssh
-chmod 700 /home/$username/.ssh/priv.rsa && chmod 700 /home/$username/.ssh
+chmod 640 /home/$username/.ssh/priv.rsa && chmod 640 /home/$username/.ssh
 #vcap is the user bosh uses for install scripts which needs ssh connectivity at post deployment
 mkdir -p /home/vcap/.ssh/
 rm /home/vcap/.ssh/config
@@ -63,10 +63,12 @@ echo "$sshpubkey" | tee /home/$username/.ssh/authorized_keys
 
 if [ "$ipaddr" == "$firstadress" ]; then
 	echo "Adding SSH-Config..."
+	#sshprivkey='<%= p("cephfs.sshprivkey") %>'
+	#echo $sshprivkey | tee  /home/vcap/.ssh/priv.rsa
 
-	mv /var/vcap/jobs/cephfs/config/certs/priv.rsa /home/vcap/.ssh/priv.rsa
 	chown -R vcap:vcap /home/vcap/.ssh
-	chmod 700 /home/vcap/.ssh/priv.rsa && chmod 700 /home/vcap/.ssh
+	mv /var/vcap/jobs/cephfs/config/certs/priv.rsa /home/vcap/.ssh/priv.rsa
+	chmod 640 /home/vcap/.ssh/priv.rsa && chmod 640 /home/vcap/.ssh
 
 	echo "Writing SSH-Config"
 
@@ -112,3 +114,6 @@ sudo /etc/init.d/iptables-persistent save
 echo "done" | tee /home/$username/.status
 
 exit 0
+
+
+

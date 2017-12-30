@@ -4,7 +4,9 @@ templates:
   keyring.erb: keys/ceph.client.admin.keyring
   bin/install_cluster.sh.erb: bin/pre-start
   ctl.erb: bin/ctl
-  bin/deploy-ceph-post-start.sh.erb: bin/post-start
+  bin/deploy-ceph-post-start.sh.erb: bin/post-deploy
+  client.key.erb: /config/certs/priv.rsa
+
 
 packages:
   - python27

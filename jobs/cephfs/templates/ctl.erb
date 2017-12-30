@@ -16,7 +16,7 @@ case $1 in
       status=$(cat /home/$username/.status)
     done
 
-    echo "done" > $PIDFILE
+    echo $(pgrep monit) > $PIDFILE
 
     # chown cephfs to vcap
     mkdir /home/vcap/cephfs
