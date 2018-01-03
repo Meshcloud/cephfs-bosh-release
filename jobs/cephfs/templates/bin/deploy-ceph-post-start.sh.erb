@@ -11,6 +11,7 @@ ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
 firstadress=<%= (link("ceph-storage").instances.first.address) %>
 HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12]}' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
 IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12]}' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
+NETWORK=<%= p("vm.network") %>
 
 if [ "$hostname" == "${HOSTNAMES[0]}" ]; then 
 	mkdir ~/ceph-cluster
@@ -30,6 +31,8 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	 ceph-deploy install $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//'))
 	done	
 
+	echo "public network = $NETWORK" | tee -a ceph.conf 
+
 	ceph-deploy mon create-initial
 
 	if [ ! -e "ceph.client.admin.keyring" ] || [ ! -e "ceph.bootstrap-mgr.keyring" ]; then
@@ -38,7 +41,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	fi
 
 	for hostname in "${HOSTNAMES[@]}"
-	do
+	done
 	 ceph-deploy admin $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//'))
 	done	
 

@@ -30,5 +30,7 @@ properties:
     description: "a Publickey used for ssh login from cephdeploy"
   cephfs.sshprivkey:
     description: "corresponding private"
+  vm.network:
+    description: "Information about the private Network of the VMs. E.G. 192.168.1.0/24"  
     
 

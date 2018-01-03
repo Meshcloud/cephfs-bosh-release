@@ -41,6 +41,9 @@ jobs:
     update:
       serial: true
     properties:
+      vm:
+        network:
+          172.16.105.0/24
       cephfs:
         client_keyring: |
           [client.admin]
