@@ -14,13 +14,13 @@ IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[
 NETWORK='<%= p("vm.network") %>'
 
 if [ "$hostname" == "${HOSTNAMES[0]}" ]; then 
-	mkdir ~/ceph-cluster
-	cd ~/ceph-cluster 
+	mkdir /root/ceph-cluster
+	cd /root/ceph-cluster 
 
 	echo "Deploying monitor to $ipaddr"
 	ceph-deploy new $(echo $(echo ${HOSTNAMES[0]} | sed -e 's/^"//' -e 's/"$//')) #make the admin Node to the Monitor node
 
-	if [ ! -e "ceph.conf" ]; then
+	if [ ! -e "/root/ceph.conf" ]; then
         echo "Error while deploying monitor. File ceph.conf is missing - Exiting!"
         exit 1
 	fi
@@ -33,15 +33,15 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 
 	echo "public network = $NETWORK" | tee -a ceph.conf 
 
-	ceph-deploy mon create-initial
+	ceph-deploy --overwrite-conf mon create-initial
 
-	if [ ! -e "ceph.client.admin.keyring" ] || [ ! -e "ceph.bootstrap-mgr.keyring" ]; then
+	if [ ! -e "/root/ceph.client.admin.keyring" ] || [ ! -e "/root/ceph.bootstrap-mgr.keyring" ]; then
         echo "Error while creating initial monitor. keyring missing. Exiting!"
         exit 1
 	fi
 
 	for hostname in "${HOSTNAMES[@]}"
-	done
+	do
 	 ceph-deploy admin $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//'))
 	done	
 
