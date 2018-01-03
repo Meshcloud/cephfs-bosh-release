@@ -5,7 +5,6 @@ name: cephfs
 releases:
   - name: cephfs
     version: latest
-
 update:
   canaries: 1
   canary_watch_time: 15000-60000
@@ -16,6 +15,9 @@ stemcells:
   - alias: default
     os: ubuntu-trusty
     version: latest
+
+features:    
+  use_dns_addresses: true
 
 credentials:
   username: fucker
