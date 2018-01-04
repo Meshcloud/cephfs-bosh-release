@@ -35,7 +35,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 
 	ceph-deploy --overwrite-conf mon create-initial
 
-	if [ ! -e "/root/ceph-cluster/ceph.client.admin.keyring" ] || [ ! -e "/root/ceph-cluster/ceph.bootstrap-mgr.keyring" ]; then
+	if [ ! -e "/root/ceph-cluster/ceph.client.admin.keyring" ]; then
         echo "Error while creating initial monitor. keyring missing. Exiting!"
         exit 1
 	fi
