@@ -27,7 +27,7 @@ jobs:
   - name: cephfs
     instances: 5
     vm_type: default  
-    persistent_disk: 5000
+    persistent_disk: 25000
     stemcell: default
     networks:
     - name: default
