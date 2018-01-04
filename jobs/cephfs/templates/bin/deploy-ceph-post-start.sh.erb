@@ -53,6 +53,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	
 	for hostname in "${HOSTNAMES[@]}"
 	do
+	 ssh $hostname sudo umount -f /var/vcap/store	
 	 ceph-deploy disk zap $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
 	 ceph-deploy osd prepare $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
 	 ceph-deploy osd activate $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
