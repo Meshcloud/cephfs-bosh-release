@@ -20,7 +20,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	echo "Deploying monitor to $ipaddr"
 	ceph-deploy new $(echo $(echo ${HOSTNAMES[0]} | sed -e 's/^"//' -e 's/"$//')) #make the admin Node to the Monitor node
 
-	if [ ! -e "/root/ceph.conf" ]; then
+	if [ ! -e "/root/ceph-cluster/ceph.conf" ]; then
         echo "Error while deploying monitor. File ceph.conf is missing - Exiting!"
         exit 1
 	fi
@@ -35,7 +35,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 
 	ceph-deploy --overwrite-conf mon create-initial
 
-	if [ ! -e "/root/ceph.client.admin.keyring" ] || [ ! -e "/root/ceph.bootstrap-mgr.keyring" ]; then
+	if [ ! -e "/root/ceph-cluster/ceph.client.admin.keyring" ] || [ ! -e "/root/ceph-cluster/ceph.bootstrap-mgr.keyring" ]; then
         echo "Error while creating initial monitor. keyring missing. Exiting!"
         exit 1
 	fi
@@ -58,7 +58,6 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	 ceph-deploy osd activate $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
 	done	
 
-	exit 
 	ceph health > /var/vcap/sys/log/cephfs/health
 
 	#Creating Metadata Server 
