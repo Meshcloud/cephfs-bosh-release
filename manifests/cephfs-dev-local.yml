@@ -26,7 +26,10 @@ credentials:
 jobs:
   - name: cephfs
     instances: 5
-    vm_type: cb1.xlarge  
+    vm_types:
+    - name: default
+      cloud_properties:
+        instance_type: cb1.xlarge  
     persistent_disk: 30000
     stemcell: default
     networks:
