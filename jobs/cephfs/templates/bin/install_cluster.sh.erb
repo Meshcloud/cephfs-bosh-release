@@ -58,8 +58,8 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 
 	for i in "${!HOSTNAMES[@]}"
 	do
-	 echo "Host $(echo $(echo ${HOSTNAMES[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a ~/.ssh/config 
-	 echo " Hostname $(echo $(echo ${IPADDRESSES[$i]} | sed -e 's/^"//' -e 's/"$//'))" | tee -a ~/.ssh/config
+	 echo "Host ${HOSTNAMES[$i]}"  | tee -a ~/.ssh/config 
+	 echo " Hostname ${IPADDRESSES[$i]}" | tee -a ~/.ssh/config
 	 echo " User $username" | tee -a ~/.ssh/config
 	 echo " IdentityFile ~/.ssh/priv.rsa" | tee -a ~/.ssh/config
 	 echo " StrictHostKeyChecking no" | tee -a ~/.ssh/config
