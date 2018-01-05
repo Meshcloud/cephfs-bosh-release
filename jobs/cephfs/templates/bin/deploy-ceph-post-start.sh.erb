@@ -18,7 +18,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	cd /root/ceph-cluster 
 
 	echo "Deploying monitor to $ipaddr"
-	ceph-deploy new $(echo $(echo ${HOSTNAMES[0]} | sed -e 's/^"//' -e 's/"$//')) #make the admin Node to the Monitor node
+	ceph-deploy new $(echo ${HOSTNAMES[0]} ) #make the admin Node to the Monitor node
 
 	if [ ! -e "/root/ceph-cluster/ceph.conf" ]; then
         echo "Error while deploying monitor. File ceph.conf is missing - Exiting!"
@@ -28,7 +28,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 
 	for hostname in "${HOSTNAMES[@]}"
 	do
-	 ceph-deploy install $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//'))
+	 ceph-deploy install $(echo $hostname)
 	done	
 
 	echo "public network = $NETWORK" | tee -a ceph.conf 
@@ -42,7 +42,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 
 	for hostname in "${HOSTNAMES[@]}"
 	do
-	 ceph-deploy admin $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//'))
+	 ceph-deploy admin $(echo $hostname)
 	done	
 
 
@@ -54,9 +54,9 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	for hostname in "${HOSTNAMES[@]}"
 	do
 	 ssh $hostname sudo umount -f /var/vcap/store	
-	 ceph-deploy disk zap $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
-	 ceph-deploy osd prepare $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
-	 ceph-deploy osd activate $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
+	 ceph-deploy disk zap $hostname:$diskfile
+	 ceph-deploy osd prepare $hostname:$diskfile
+	 ceph-deploy osd activate $hostname:$diskfile
 	done	
 
 	ceph health > /var/vcap/sys/log/cephfs/health
@@ -65,7 +65,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	##We choose the Second Server of our cluster to be the Metada Server
 
 
-	ceph-deploy mds create $(echo $(echo $${HOSTNAMES[1]}| sed -e 's/^"//' -e 's/"$//'))
+	ceph-deploy mds create ${HOSTNAMES[1]}
 	ceph-deploy install ceph-client
 
 	#Deploy CephFS
