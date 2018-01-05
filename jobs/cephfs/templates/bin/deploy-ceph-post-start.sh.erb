@@ -64,10 +64,14 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	#Creating Metadata Server 
 	##We choose the Second Server of our cluster to be the Metada Server
 
-
 	ceph-deploy mds create ${HOSTNAMES[1]}
 	ceph-deploy install ceph-client
 
+	#Creating additional monitorsST
+	for hostname in "${HOSTNAMES[@]:1:$((${#HOSTNAMES[@]} / 2))-1}"
+	do 
+		ceph-deploy mon add $hostname
+	done 
 	#Deploy CephFS
 	##Create OSD Pools
 
