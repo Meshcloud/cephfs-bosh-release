@@ -5,7 +5,6 @@ name: cephfs
 releases:
   - name: cephfs
     version: latest
-
 update:
   canaries: 1
   canary_watch_time: 15000-60000
@@ -17,6 +16,9 @@ stemcells:
     os: ubuntu-trusty
     version: latest
 
+features:    
+  use_dns_addresses: true
+
 credentials:
   username: fucker
   password: ass
@@ -24,8 +26,8 @@ credentials:
 jobs:
   - name: cephfs
     instances: 5
-    vm_type: default  
-    persistent_disk: 5000
+    vm_type: xlarge  
+    persistent_disk: 30000
     stemcell: default
     networks:
     - name: default
@@ -39,6 +41,9 @@ jobs:
     update:
       serial: true
     properties:
+      vm:
+        network:
+          172.16.105.0/24
       cephfs:
         client_keyring: |
           [client.admin]

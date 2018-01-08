@@ -9,90 +9,76 @@ hostname=`hostname`
 ipaddr=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
 firstadress=<%= (link("ceph-storage").instances.first.address) %>
-clusternodes=<%= (link("ceph-storage").instances) %>
-CLUSTERNODES='<%=
-		clusternodes = link('ceph-storage').instances.map do |instance|
-		{
-			"name" => instance.name,
-			"id" => instance.id,
-			"index" => instance.index,
-			"az" => instance.az,
-			"address" => instance.address
-		}
-		end
-		JSON.dump(clusternodes)
-	%>' 
-ADDRESSES=( $(echo $CLUSTERNODES | jq '.[] | .address') )
-IDS=( $(echo $CLUSTERNODES | jq '.[] | .id') )
+HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12]}' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
+IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12]}' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
+NETWORK='<%= p("vm.network") %>'
 
-if [ "$ipaddr" == "$firstadress" ]; then 
-	mkdir /home/vcap/ceph-cluster
-	chown vcap:vcap -R /home/vcap/ceph-cluster
-sudo -u vcap bash << EOF
-set -x
-cd /home/vcap/ceph-cluster
-whoami
+if [ "$hostname" == "${HOSTNAMES[0]}" ]; then 
+	mkdir /root/ceph-cluster
+	cd /root/ceph-cluster 
 
-echo "Deploying monitor to $ipaddr"
-ceph-deploy new $(echo $(echo ${IDS[0]} | sed -e 's/^"//' -e 's/"$//')) #make the admin Node to the Monitor node
+	echo "Deploying monitor to $ipaddr"
+	ceph-deploy new $(echo ${HOSTNAMES[0]} ) #make the admin Node to the Monitor node
 
-if [ ! -e "ceph.conf" ]; then
-    echo "Error while deploying monitor. File ceph.conf is missing - Exiting!"
-    exit 1
-fi
+	if [ ! -e "/root/ceph-cluster/ceph.conf" ]; then
+        echo "Error while deploying monitor. File ceph.conf is missing - Exiting!"
+        exit 1
+	fi
 
 
-for hostname in "${IDS[@]}"
-do
-ceph-deploy install $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//'))
-done	
+	for hostname in "${HOSTNAMES[@]}"
+	do
+	 ceph-deploy install $(echo $hostname)
+	done	
 
-ceph-deploy mon create-initial
+	echo "public network = $NETWORK" | tee -a ceph.conf 
 
-if [ ! -e "ceph.client.admin.keyring" ] || [ ! -e "ceph.bootstrap-mgr.keyring" ]; then
-	echo "Error while creating initial monitor. keyring missing. Exiting!"
-    exit 1
-fi
+	ceph-deploy --overwrite-conf mon create-initial
 
-for hostname in "${IDS[@]}"
-do
-ceph-deploy admin $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//'))
-done	
-EOF
+	if [ ! -e "/root/ceph-cluster/ceph.client.admin.keyring" ]; then
+        echo "Error while creating initial monitor. keyring missing. Exiting!"
+        exit 1
+	fi
+
+	for hostname in "${HOSTNAMES[@]}"
+	do
+	 ceph-deploy admin $(echo $hostname)
+	done	
+
 
 	##Creating OSDS
 
 	diskfile=$(sudo lsblk | grep /var/vcap/store |  cut -d" " -f1 | sed 's/^..//' | sed 's/.$//')
-sudo -u vcap bash << EOF
-set -x
-cd /home/vcap/ceph-cluster
-for hostname in "${IDS[@]}"
-do
- ceph-deploy disk zap $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
- ceph-deploy osd prepare $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
- ceph-deploy osd activate $(echo $(echo $hostname| sed -e 's/^"//' -e 's/"$//')):$diskfile
-done	
-
-EOF
+	$(su vcap)
+	
+	for hostname in "${HOSTNAMES[@]}"
+	do
+	 ssh $hostname sudo umount -f /var/vcap/store	
+	 ceph-deploy disk zap $hostname:$diskfile
+	 ceph-deploy osd prepare $hostname:$diskfile
+	 ceph-deploy osd activate $hostname:$diskfile
+	done	
 
 	ceph health > /var/vcap/sys/log/cephfs/health
 
 	#Creating Metadata Server 
 	##We choose the Second Server of our cluster to be the Metada Server
-sudo -u vcap bash << EOF
-set -x
-cd /home/vcap/ceph-cluster
-ceph-deploy mds create $(echo $(echo $${IDS[1]}| sed -e 's/^"//' -e 's/"$//'))
-ceph-deploy install ceph-client
 
-#Deploy CephFS
-##Create OSD Pools
+	ceph-deploy mds create ${HOSTNAMES[1]}
+	ceph-deploy install ceph-client
 
-ceph osd pool create cephfs_data 128
-ceph osd pool create cephfs_metadata 128
-ceph fs new cephfs cephfs_metadata cephfs_data
-ceph mds stat
-EOF
+	#Creating additional monitorsST
+	for hostname in "${HOSTNAMES[@]:1:$((${#HOSTNAMES[@]} / 2))-1}"
+	do 
+		ceph-deploy mon add $hostname
+	done 
+	#Deploy CephFS
+	##Create OSD Pools
+
+	ceph osd pool create cephfs_data 128
+	ceph osd pool create cephfs_metadata 128
+	ceph fs new cephfs cephfs_metadata cephfs_data
+	ceph mds stat
 fi	
 
 
