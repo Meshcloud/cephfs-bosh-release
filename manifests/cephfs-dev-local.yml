@@ -41,9 +41,9 @@ instance_groups:
   - name: cephfs
     release: cephfs
     consumes: 
-      ceph-storage:{from: ceph-storage}
+      ceph-storage: {from: ceph-storage}
     provides:
-      ceph-storage:{as: ceph-storage} 
+      ceph-storage: {as: ceph-storage} 
     update:
       serial: true
     properties:
