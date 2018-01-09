@@ -1,8 +1,7 @@
 ---
 name: get_credentials
-
 templates: 
-	run.sh: bin/run
+  run.sh: bin/run
 
 packages: 
 - get_credentials
