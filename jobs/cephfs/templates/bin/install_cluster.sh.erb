@@ -13,8 +13,8 @@ rm /home/$username/.status
 apt-get install jq
 sudo apt-get install apt-transport-https
 
-HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12]}' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
-IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12]}' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
+HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12], 'deployment_name':.[8]}' | jq 'select(.deployment_name == "cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
+IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8]}' | jq 'select(.deployment_name == "cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
 
 #Setup of Ceph Admin Node 
 

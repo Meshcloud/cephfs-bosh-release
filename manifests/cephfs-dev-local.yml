@@ -23,64 +23,70 @@ credentials:
   username: fucker
   password: ass
 
-jobs:
+instance_groups:
+- name: cephfs
+  instances: 5
+  vm_type: xlarge  
+  persistent_disk: 30000
+  stemcell: default
+  networks:
+  - name: default
+  jobs:
   - name: cephfs
-    instances: 5
-    vm_type: xlarge  
-    persistent_disk: 30000
-    stemcell: default
-    networks:
-    - name: default
-    jobs:
-    - release: cephfs
-      name: cephfs
-    consumes: 
-      ceph-storage:{from: ceph-storage}
-    provides:
-      ceph-storage:{as: ceph-storage} 
-    update:
-      serial: true
-    properties:
-      vm:
-        network:
-          172.16.105.0/24
-      cephfs:
-        client_keyring: |
-          [client.admin]
-            key = AQDrWzJae1DGCxAAXGvPgKptRBAIGM3bxztrtw==
-            caps mds = "allow"
-            caps mon = "allow *"
-            caps osd = "allow *"
-        username:
-          meshlab
-        sshpubkey: |
-          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDzfLs5hFJ3TRj0OeaLUT83+QylQF/loRFTfFO5sqYjkMwYYVGVtTUDPQ0My+W6llzJeIQGGeTsRu+auIU03DdYZMHa0htLfLQsMlDEIoJe66W/DwC25CFzWEPknEQ9iDuQeWujA/695PoHS6m2qDLNJcFJfLriOy19E9f0tij5vaiKSuMzgaNHmqeVjkIaKTj+yiylfXZ6K+7pwgx+ZjeZk1kXrtxGJY3mAcyetYOgpuywh+11XkBYwOsJfBdD4hY3w9DPs+eQYIjvpZOWNQRq+d555LSI7Hi8/Crs/Q9oFdLgDDYq96+lRp2CABpxNDLKDF/K++DdNJtU1C0O13p/ jannikheyl@Janniks-MBP
-        sshprivkey: |
-          -----BEGIN RSA PRIVATE KEY-----
-          MIIEpAIBAAKCAQEA83y7OYRSd00Y9Dnmi1E/N/kMpUBf5aERU3xTubKmI5DMGGFR
-          lbU1Az0NDMvlupZcyXiEBhnk7EbvmriFNNw3WGTB2tIbS3y0LDJQxCKCXuulvw8A
-          tuQhc1hD5JxEPYg7kHlrowP+veT6B0uptqgyzSXBSXy64jstfRPX9LYo+b2oikrj
-          M4GjR5qnlY5CGik4/sospX12eivu6cIMfmY3mZNZF67cRiWN5gHMnrWDoKbssIft
-          dV5AWMDrCXwXQ+IWN8PQz7PnkGCI76WTljUEavneeeS0iOx4vPwq7P0PaBXS4Aw2
-          KvevpUadggAacTQyygxfyvvg3TSbVNQtDtd6fwIDAQABAoIBAQCC/xlPcYRYkQ8a
-          3kfNrnF/sKsAASlWxpgmvV3iK149Bjr35uvYynvx+RebSduXziuvbPpCug2ynNtt
-          91YbQVs5YEP3cVCkBTx+BrfzPcm8PbWXm/+7ZfMlNliYlwYTwMajDOA+/PhBu/5U
-          jH2LOuTSAD0ER2nYKxRnFZT7IEHdUgK8pc11iXTNJYzZ1lllqXEATWHTmSRGO7EQ
-          XhKVaVc+c/iI46FbugtjOn9NekHcx6d8l79H2jqgI8uV+LgEYBwyyCPH9wq2aI8e
-          Uu5yNMIuJ/CAgLcLWw6loZZv8VqWK7cmMj+cFhg03zE2vnfos9RCCQQE1Ymlc0xo
-          Xv8+rS8pAoGBAP2bpbqdKdnG7M9SimBUyyTfvlHBJIbKgLmh9su225h5jSECT/Og
-          IgUQzBiZPP06u7loEP2anMLpfR8w5regHYMUzxEiJNj3zc3d9oQAmE2/Lav5DHMr
-          FG7Wt1uxb32Leo//8gWKLaW0dNuZaSt1mZT/7dFcTHENsshcTfL3U9RtAoGBAPXI
-          pZB547A3jjIuVBDZLOt4pWSjsT9TFRgMi/wid0vmGRbf7LDvhiauwjo5x3ABnEL4
-          qYAYfReQ+tRktcUxRJiTU0M5VyGbrcAubZKDV9ZMdzUqKqigLtEcEzgqZdfqQQ+d
-          0zZPh/zHDcIRmXoseggBVXtrBZ24G1PtjtVeVn8bAoGBANE1B/c01SRYzFuOvKYQ
-          7O/DPy4UBXzIKn54FK4ib26NvxVe4fOYwteo7qTQLJa9T8T4CyQZ2n2TvWrwnTMX
-          e6D5loOMxhbR/U15cHWeRAXG0vdN4K5U+Gsi52lVqyJG4FlQCyf0wAk1Hz1UhYSb
-          Y5GdumJ+IHUWlshgFNF8pAPVAoGAY67hF1uYMNwXW9rWVY7/XPEtg0ewl5JGt94+
-          2B/SaoIEIvbmtEwxCHdQZvUQIilFCxR3CnDkKy6tzH6cCkIVJBx8ZINZB1Rwf8VU
-          w1tpwIx6vKFBc+qjkkPkt57ad1uWz5KfGyPeb3L77X3d1WM8iwqfdNLPEEyfKMbs
-          azU7t4kCgYAoXMOsG3mds+6dhjfUsZueT7+R5MA3DtDe1YLxC+QC3EXZtftwGzpc
-          ObPvuvz1Wa0wvCf5XzgSNTv3F8azx+qefPNbRXJvS5dobsGuEJvSmgnnC4RMjGvn
-          GHzMxMBY3RAlmGNuQq19udUsuN6Q1ZNRq6KktHxxi5+e3apCZ//odA==
-          -----END RSA PRIVATE KEY-----
-              
+    release: cephfs
+  consumes: 
+    ceph-storage:{from: ceph-storage}
+  provides:
+    ceph-storage:{as: ceph-storage} 
+  update:
+    serial: true
+  properties:
+    vm:
+      network:
+        172.16.105.0/24
+    cephfs:
+      client_keyring: |
+        [client.admin]
+          key = AQDrWzJae1DGCxAAXGvPgKptRBAIGM3bxztrtw==
+          caps mds = "allow"
+          caps mon = "allow *"
+          caps osd = "allow *"
+      username:
+        meshlab
+      sshpubkey: |
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDzfLs5hFJ3TRj0OeaLUT83+QylQF/loRFTfFO5sqYjkMwYYVGVtTUDPQ0My+W6llzJeIQGGeTsRu+auIU03DdYZMHa0htLfLQsMlDEIoJe66W/DwC25CFzWEPknEQ9iDuQeWujA/695PoHS6m2qDLNJcFJfLriOy19E9f0tij5vaiKSuMzgaNHmqeVjkIaKTj+yiylfXZ6K+7pwgx+ZjeZk1kXrtxGJY3mAcyetYOgpuywh+11XkBYwOsJfBdD4hY3w9DPs+eQYIjvpZOWNQRq+d555LSI7Hi8/Crs/Q9oFdLgDDYq96+lRp2CABpxNDLKDF/K++DdNJtU1C0O13p/ jannikheyl@Janniks-MBP
+      sshprivkey: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEA83y7OYRSd00Y9Dnmi1E/N/kMpUBf5aERU3xTubKmI5DMGGFR
+        lbU1Az0NDMvlupZcyXiEBhnk7EbvmriFNNw3WGTB2tIbS3y0LDJQxCKCXuulvw8A
+        tuQhc1hD5JxEPYg7kHlrowP+veT6B0uptqgyzSXBSXy64jstfRPX9LYo+b2oikrj
+        M4GjR5qnlY5CGik4/sospX12eivu6cIMfmY3mZNZF67cRiWN5gHMnrWDoKbssIft
+        dV5AWMDrCXwXQ+IWN8PQz7PnkGCI76WTljUEavneeeS0iOx4vPwq7P0PaBXS4Aw2
+        KvevpUadggAacTQyygxfyvvg3TSbVNQtDtd6fwIDAQABAoIBAQCC/xlPcYRYkQ8a
+        3kfNrnF/sKsAASlWxpgmvV3iK149Bjr35uvYynvx+RebSduXziuvbPpCug2ynNtt
+        91YbQVs5YEP3cVCkBTx+BrfzPcm8PbWXm/+7ZfMlNliYlwYTwMajDOA+/PhBu/5U
+        jH2LOuTSAD0ER2nYKxRnFZT7IEHdUgK8pc11iXTNJYzZ1lllqXEATWHTmSRGO7EQ
+        XhKVaVc+c/iI46FbugtjOn9NekHcx6d8l79H2jqgI8uV+LgEYBwyyCPH9wq2aI8e
+        Uu5yNMIuJ/CAgLcLWw6loZZv8VqWK7cmMj+cFhg03zE2vnfos9RCCQQE1Ymlc0xo
+        Xv8+rS8pAoGBAP2bpbqdKdnG7M9SimBUyyTfvlHBJIbKgLmh9su225h5jSECT/Og
+        IgUQzBiZPP06u7loEP2anMLpfR8w5regHYMUzxEiJNj3zc3d9oQAmE2/Lav5DHMr
+        FG7Wt1uxb32Leo//8gWKLaW0dNuZaSt1mZT/7dFcTHENsshcTfL3U9RtAoGBAPXI
+        pZB547A3jjIuVBDZLOt4pWSjsT9TFRgMi/wid0vmGRbf7LDvhiauwjo5x3ABnEL4
+        qYAYfReQ+tRktcUxRJiTU0M5VyGbrcAubZKDV9ZMdzUqKqigLtEcEzgqZdfqQQ+d
+        0zZPh/zHDcIRmXoseggBVXtrBZ24G1PtjtVeVn8bAoGBANE1B/c01SRYzFuOvKYQ
+        7O/DPy4UBXzIKn54FK4ib26NvxVe4fOYwteo7qTQLJa9T8T4CyQZ2n2TvWrwnTMX
+        e6D5loOMxhbR/U15cHWeRAXG0vdN4K5U+Gsi52lVqyJG4FlQCyf0wAk1Hz1UhYSb
+        Y5GdumJ+IHUWlshgFNF8pAPVAoGAY67hF1uYMNwXW9rWVY7/XPEtg0ewl5JGt94+
+        2B/SaoIEIvbmtEwxCHdQZvUQIilFCxR3CnDkKy6tzH6cCkIVJBx8ZINZB1Rwf8VU
+        w1tpwIx6vKFBc+qjkkPkt57ad1uWz5KfGyPeb3L77X3d1WM8iwqfdNLPEEyfKMbs
+        azU7t4kCgYAoXMOsG3mds+6dhjfUsZueT7+R5MA3DtDe1YLxC+QC3EXZtftwGzpc
+        ObPvuvz1Wa0wvCf5XzgSNTv3F8azx+qefPNbRXJvS5dobsGuEJvSmgnnC4RMjGvn
+        GHzMxMBY3RAlmGNuQq19udUsuN6Q1ZNRq6KktHxxi5+e3apCZ//odA==
+        -----END RSA PRIVATE KEY-----
+  - name: get_mons
+    release: cephfs
+    properties: {}
+  - name: get_credentials
+    release: cephfs
+    properties: {}        
+            

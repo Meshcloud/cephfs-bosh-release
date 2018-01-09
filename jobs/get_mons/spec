@@ -1,0 +1,10 @@
+---
+name: get_mons
+
+templates: 
+	run.sh: bin/run
+
+packages: 
+- get_mons
+
+properties: {}

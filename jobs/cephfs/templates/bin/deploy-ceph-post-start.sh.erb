@@ -9,8 +9,8 @@ hostname=`hostname`
 ipaddr=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
 firstadress=<%= (link("ceph-storage").instances.first.address) %>
-HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12]}' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
-IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12]}' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
+HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12], 'deployment_name':.[8]}' | jq 'select(.deployment_name == "cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
+IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8]}' | jq 'select(.deployment_name == "cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
 NETWORK='<%= p("vm.network") %>'
 
 if [ "$hostname" == "${HOSTNAMES[0]}" ]; then 
@@ -65,7 +65,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	##We choose the Second Server of our cluster to be the Metada Server
 
 	ceph-deploy mds create ${HOSTNAMES[1]}
-	ceph-deploy install ceph-client
+	ceph-deploy install ceph-client ${HOSTNAMES[1]}
 
 	#Creating additional monitorsST
 	for hostname in "${HOSTNAMES[@]:1:$((${#HOSTNAMES[@]} / 2))-1}"
