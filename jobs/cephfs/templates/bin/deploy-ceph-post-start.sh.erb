@@ -8,10 +8,10 @@ hostname=`hostname`
 
 ipaddr=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
-DEPLOYMENT=<%= (link("ceph-storage").instances.first.deployment) %>
+DEPLOYMENT=<%= spec.deployment %>
 firstadress=<%= (link("ceph-storage").instances.first.address) %>
-HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12], 'deployment_name':.[8]}' | jq 'select(.deployment_name == "$DEPlOYMENT")' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
-IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8]}' | jq 'select(.deployment_name == "$DEPlOYMENT")' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
+HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12], 'deployment_name':.[8]}' | jq 'select(.deployment_name == "`echo $DEPlOYMENT`")' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
+IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8]}' | jq 'select(.deployment_name == "`echo $DEPlOYMENT`")' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
 NETWORK='<%= p("vm.network") %>'
 
 if [ "$hostname" == "${HOSTNAMES[0]}" ]; then 
