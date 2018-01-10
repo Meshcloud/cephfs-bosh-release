@@ -11,9 +11,11 @@ if [ ! -e "ceph.conf" ]; then
 	ceph osd pool create "cephfs_metadata_$RANDOM" 128
 	ceph fs new "cephfs_$RANDOM " "cephfs_data_$RANDOM" "cephfs_data_$RANDOM"
 
-	if[[ !``ceph mds stat` | grep "active"` = '' ]]; then
-		exit 1
-	fi	
+	if [[ $(ceph mds stat | grep "active") = '' ]]
+	then
+		echo "Meta Data Service is not active"
+        exit 1
+	fi
 
 	ceph auth add client.test mon 'allow r' osd 'allow rw pool="cephfs_data_$RANDOM" allow rw pool="cephfs_data_$RANDOM"' 
 
