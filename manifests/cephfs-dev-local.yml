@@ -52,7 +52,7 @@ instance_groups:
           172.16.105.0/24
       cephfs:
         client_keyring: |
-          [client.admin]
+          [client.testuser]
             key = AQDrWzJae1DGCxAAXGvPgKptRBAIGM3bxztrtw==
             caps mds = "allow"
             caps mon = "allow *"

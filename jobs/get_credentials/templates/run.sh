@@ -6,7 +6,7 @@ RANDOM=`shuf -i 2000-65000 -n 1`
 set -e
 pushd $CLUSTER
 
-if [ ! -e "ceph.conf" ]; then
+if [ ! -e "$CLUSRER/ceph.conf" ]; then
 	ceph osd pool create "cephfs_data_$RANDOM" 128
 	ceph osd pool create "cephfs_metadata_$RANDOM" 128
 	ceph fs new "cephfs_$RANDOM " "cephfs_data_$RANDOM" "cephfs_data_$RANDOM"

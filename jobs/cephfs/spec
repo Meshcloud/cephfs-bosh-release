@@ -1,7 +1,7 @@
 ---
 name: cephfs
 templates:
-  keyring.erb: keys/ceph.client.admin.keyring
+  keyring.erb: keys/ceph.client.testuser.keyring
   bin/install_cluster.sh.erb: bin/pre-start
   ctl.erb: bin/ctl
   bin/deploy-ceph-post-start.sh.erb: bin/post-deploy

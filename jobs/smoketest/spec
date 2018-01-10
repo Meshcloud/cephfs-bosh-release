@@ -1,0 +1,9 @@
+---
+name: smoketest
+templates: 
+  run.sh: bin/run
+properties: {}
+consumes:
+  - name: ceph-storage
+    type: storage
+
