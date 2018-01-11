@@ -64,6 +64,8 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	 echo " StrictHostKeyChecking no" | tee -a ~/.ssh/config
 	done	
 
+	cp /home/$username/.ssh/authorized_keys /root/.ssh/authorized_keys
+
 	#add etc Hosts  
 cat<<EOF >hosts
 127.0.0.1       localhost
@@ -76,6 +78,7 @@ EOF
 
 
 cat<<EOF >>hosts 
+
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback
 ff02::1 ip6-allnodes
@@ -86,6 +89,8 @@ EOF
 else
 	echo "being no admin host skipping SSH Confg"
 fi		
+
+
 
 #open ports and save config
 echo "Adding Routes..."
