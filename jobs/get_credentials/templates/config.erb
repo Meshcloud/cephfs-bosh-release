@@ -2,6 +2,6 @@
 
 Host <%= link('ceph-storage').instances.first.address %>
     Hostname <%= link('ceph-storage').instances.first.address %>
-    User <%= link('ceph-storage').p.cephfs.username %>
+    User <%= link('ceph-storage').p('cephfs.username') %>
     IdentityFile  /root/.ssh/priv.rsa
     StrictHostKeyChecking no

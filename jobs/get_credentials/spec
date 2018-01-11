@@ -2,8 +2,8 @@
 name: get_credentials
 templates: 
   run.sh: bin/run
-  priv.key.erb: /root/.ssh/priv.rsa
-  config.erb: /root/.ssh/config
+  priv.key.erb: /root/.ssh/priv.rsa.test
+  config.erb: /root/.ssh/config.test
 properties: {}
 consumes:
   - name: ceph-storage
