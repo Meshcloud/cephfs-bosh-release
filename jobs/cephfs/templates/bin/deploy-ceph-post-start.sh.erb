@@ -8,8 +8,8 @@ hostname=`hostname`
 
 ipaddr=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
-DEPLOYMENT=<%= spec.deployment %>
 firstadress=<%= (link("ceph-storage").instances.first.address) %>
+DEPLOYMENT=<%= spec.deployment %>
 HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12], 'deployment_name':.[8]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
 IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
 NETWORK='<%= p("vm.network") %>'
@@ -80,6 +80,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	ceph osd pool create cephfs_metadata 128
 	ceph fs new cephfs cephfs_metadata cephfs_data
 	ceph mds stat
+	ceph fs flag set enable_multiple true  --yes-i-really-mean-it
 fi	
 
 

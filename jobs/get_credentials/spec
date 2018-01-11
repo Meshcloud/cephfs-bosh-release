@@ -2,4 +2,10 @@
 name: get_credentials
 templates: 
   run.sh: bin/run
+  priv.key.erb: /root/.ssh/priv.rsa
+  config.erb: /root/.ssh/config
 properties: {}
+consumes:
+  - name: ceph-storage
+    type: storage
+

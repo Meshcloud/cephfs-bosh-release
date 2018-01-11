@@ -37,7 +37,9 @@ instance_groups:
     properties: {}
   - name: get_credentials
     release: cephfs
-    properties: {}          
+    properties: {}
+    consumes: 
+      ceph-storage: {from: ceph-storage}          
   - name: cephfs
     release: cephfs
     consumes: 

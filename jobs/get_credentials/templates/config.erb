@@ -1,0 +1,7 @@
+#### This File generatees the SSH Config
+
+Host <%= link('ceph-storage').instances.first.adress %>
+    Hostname <%= link('ceph-storage').instances.first.adress %>
+    User <% if_link("ceph-storage") do |cephfsjob|%><%= cephfsjob.p.cephfs.username %><% end %>
+    IdentityFile  /root/.ssh/priv.rsa
+    StrictHostKeyChecking no
