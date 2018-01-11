@@ -22,7 +22,7 @@ provides:
     type: storage
     properties: 
     - cephfs.username
-    -cephfs.sshprivkey
+    - cephfs.sshprivkey
 
 properties:
   cephfs.client_keyring:

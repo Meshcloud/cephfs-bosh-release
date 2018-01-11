@@ -35,11 +35,6 @@ instance_groups:
   - name: get_mons
     release: cephfs
     properties: {}
-  - name: get_credentials
-    release: cephfs
-    properties: {}
-    consumes: 
-      ceph-storage: {from: ceph-storage}          
   - name: cephfs
     release: cephfs
     consumes: 
@@ -91,4 +86,16 @@ instance_groups:
           ObPvuvz1Wa0wvCf5XzgSNTv3F8azx+qefPNbRXJvS5dobsGuEJvSmgnnC4RMjGvn
           GHzMxMBY3RAlmGNuQq19udUsuN6Q1ZNRq6KktHxxi5+e3apCZ//odA==
           -----END RSA PRIVATE KEY-----
-            
+- name: smoketest
+  instances: 1
+  vm_type: gp1.small  
+  stemcell: default
+  networks:
+  - name: default
+  jobs:  
+  - name: get_credentials
+    release: cephfs
+    properties: {}
+    consumes: 
+      ceph-storage: {from: ceph-storage}   
+
