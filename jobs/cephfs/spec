@@ -20,6 +20,9 @@ consumes:
 provides:
   - name: ceph-storage
     type: storage
+    properties: 
+    - cephfs.username
+    -cephfs.sshprivkey
 
 properties:
   cephfs.client_keyring:
