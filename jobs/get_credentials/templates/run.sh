@@ -1,8 +1,8 @@
 #!/bin/bash 
 set -x
 FIRSTMON=<%= link('ceph-storage').instances.first.address %>
-
-ssh $FIRSTMON 'bash -s' < EOF
+mv /var/vcap/jobs/get_credentials/config/certs/config/* /root/.ssh/
+ssh $FIRSTMON 'bash -s' <EOF
 CLUSTER="/root/ceph-cluster/"
 RAN=`shuf -i 2000-65000 -n 1`
 
