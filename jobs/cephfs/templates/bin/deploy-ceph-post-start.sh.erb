@@ -11,7 +11,7 @@ ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
 firstadress=<%= (link("ceph-storage").instances.first.address) %>
 DEPLOYMENT=<%= spec.deployment %>
 HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12], 'deployment_name':.[8], 'instance_group':.[2]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq -r 'select(.instance_group=="cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
-IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8]},  'instance_group':.[2]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq -r 'select(.instance_group=="cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
+IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8], 'instance_group':.[2]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq -r 'select(.instance_group=="cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
 NETWORK='<%= p("vm.network") %>'
 
 ##Arrays that Holds information about the Hosts 
