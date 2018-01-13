@@ -1,0 +1,25 @@
+#Install CEPHFX for Authentification
+	ceph auth get-or-create client.admin mon 'allow *' mds 'allow *' osd 'allow *' -o /etc/ceph/keyring
+	ceph-authtool --create-keyring --gen-key -n mon. /tmp/monitor-key
+	
+	for HOSTNAME in "${MONS[@]}"
+	do
+		scp /tmp/monitor-key $HOSTNAME:~/monitor-key 
+    	ssh $HOSTNAME bash -c "'sudo cp ~/monitor-key /var/lib/ceph/mon/ceph-$HOSTNAME/keyring'"
+	done 
+	
+	for HOSTNAME in "${#OSDS[@]}"
+	do 
+		mkdir -p /tmp/ceph-$HOSTNAME
+		ceph auth get-or-create osd.$HOSTNAME mon 'allow rwx' osd 'allow *' -o /tmp/ceph-$HOSTNAME/keyring
+		scp /tmp/ceph-$HOSTNAME/keyring ${OSDS[$HOSTNAME]}:~/osd-keyring
+		ssh ${OSDS[$HOSTNAME]} bash -c "'sudo cp ~/osd-keyring /var/lib/ceph/osd/ceph-$HOSTNAME/keyring'"
+	done
+	
+	for HOSTNAME in "${#MDS[@]}"
+	do 
+		mkdir -p /tmp/ceph-$HOSTNAME
+		ceph auth get-or-create mds.$HOSTNAME mon 'allow rwx'  osd 'allow *' mds 'allow *' -o /tmp/ceph-$HOSTNAME/keyring
+		scp /tmp/ceph-$HOSTNAME/keyring ${MDS[$HOSTNAME]}:~/mds-keyring
+		ssh ${MDS[$HOSTNAME]} bash -c "'sudo cp ~/mds-keyring /var/lib/ceph/mds/ceph-$HOSTNAME/keyring'"
+	done

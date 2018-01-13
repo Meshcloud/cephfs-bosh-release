@@ -10,9 +10,14 @@ ipaddr=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  
 ifcace=$(ifconfig | grep encap:Ethernet | cut -d" " -f1)
 firstadress=<%= (link("ceph-storage").instances.first.address) %>
 DEPLOYMENT=<%= spec.deployment %>
-HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12], 'deployment_name':.[8]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
-IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
+HOSTNAMES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'host':.[11], 'id':.[12], 'deployment_name':.[8], 'instance_group':.[2]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq -r 'select(.instance_group=="cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].host') )
+IPADDRESSES=( $(cat /var/vcap/instance/dns/records.json | jq '.record_infos | .[] | {'ip':.[9], 'id':.[12], 'deployment_name':.[8]}' | jq  -r --arg DEPLOYMENT "$DEPLOYMENT" 'select(.deployment_name==$DEPLOYMENT)' | jq -r 'select(.instance_group=="cephfs")' | jq --raw-output --slurp '.=sort_by(.id) | .[].ip') )
 NETWORK='<%= p("vm.network") %>'
+
+##Arrays that Holds information about the Hosts 
+declare -a MONS
+declare -a MDS
+declare -a OSDS
 
 if [ "$hostname" == "${HOSTNAMES[0]}" ]; then 
 	mkdir /root/ceph-cluster
@@ -20,6 +25,7 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 
 	echo "Deploying monitor to $ipaddr"
 	ceph-deploy new $(echo ${HOSTNAMES[0]} ) #make the admin Node to the Monitor node
+	$MONS=( ${HOSTNAMES[0]} )
 
 	if [ ! -e "/root/ceph-cluster/ceph.conf" ]; then
         echo "Error while deploying monitor. File ceph.conf is missing - Exiting!"
@@ -51,7 +57,10 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 
 	diskfile=$(sudo lsblk | grep /var/vcap/store |  cut -d" " -f1 | sed 's/^..//' | sed 's/.$//')
 	$(su vcap)
-	
+
+	#Setting OSD Nodes to match Hostnames
+	$OSDS=( "${HOSTNAMES[@]}" )
+
 	for hostname in "${HOSTNAMES[@]}"
 	do
 	 ssh $hostname sudo umount -f /var/vcap/store	
@@ -69,8 +78,9 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	ceph-deploy install ceph-client ${HOSTNAMES[1]}
 
 	#Creating additional monitorsST
-	for hostname in "${HOSTNAMES[@]:1:$((${#HOSTNAMES[@]} / 2))-1}"
+	for hostname in "${HOSTNAMES[@]:1:$((${#HOSTNAMES[@]} / 2)-1)}"
 	do 
+		$MONS=( ${MONS[@]} $hostname )	
 		ceph-deploy mon add $hostname
 	done 
 	#Deploy CephFS
@@ -80,7 +90,11 @@ if [ "$hostname" == "${HOSTNAMES[0]}" ]; then
 	ceph osd pool create cephfs_metadata 128
 	ceph fs new cephfs cephfs_metadata cephfs_data
 	ceph mds stat
-	ceph fs flag set enable_multiple true  --yes-i-really-mean-it
+	#ceph fs flag set enable_multiple true  --yes-i-really-mean-it
+
+	
+	
+	
 fi	
 
 
